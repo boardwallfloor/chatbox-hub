@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package pb.messaging.v1;
+
+option go_package = "chatbox/pb";
+
+// Enums
+enum MessageReceipt {
+  MESSAGE_RECEIPT_STATUS_UNSPECIFIED = 0;
+  MESSAGE_RECEIPT_SENT = 1;
+  MESSAGE_RECEIPT_DELIVERED = 2;
+  MESSAGE_RECEIPT_READ = 3;
+}
+
+enum MessageTargetType {
+  MESSAGE_TARGET_TYPE_UNSPECIFIED = 0;
+  MESSAGE_TARGET_TYPE_ROOM = 1;
+  MESSAGE_TARGET_TYPE_INDIVIDUAL = 2;
+}
+
+// Service
+service MessagingService {
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse);
+  rpc MarkMessageAsDelivered(MarkMessageAsDeliveredRequest) returns (MarkMessageAsDeliveredResponse);
+  rpc AcknowledgeMessages(AcknowledgeMessagesRequest) returns (AcknowledgeMessagesResponse);
+}
+
+// Messages
+message SendMessageRequest {
+  repeated Message messages = 1;
+  MessageTargetType target_type = 2;
+  int32 target_id = 3;
+}
+
+message SendMessageResponse {
+  bool status = 1;
+}
+
+message GetMessagesRequest {
+  int32 room_id = 1;
+  int32 user_id = 2;
+}
+
+message GetMessagesResponse {
+  repeated Message messages = 1;
+}
+
+message MarkMessageAsDeliveredRequest {
+  int32 message_id = 1;
+}
+
+message MarkMessageAsDeliveredResponse {
+  bool success = 1;
+}
+
+message Message {
+  int32 id = 1;
+  int32 room_id = 2;
+  int32 sender_id = 3;
+  int32 receiver_id = 4;
+  string content = 5;
+  int64 timestamp = 6;
+  MessageReceipt status = 7;
+}
+
+message AcknowledgeMessagesRequest {
+  repeated int32 acknowledged_message_ids = 1;
+}
+
+message AcknowledgeMessagesResponse {
+  bool success = 1;
+}
